@@ -1,0 +1,5 @@
+// This is a configuration file used to determine all the projects prior to
+// building them.
+
+// Explicitly load all the SDK samples using their full path.
+include ':app'
