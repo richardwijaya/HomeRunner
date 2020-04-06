@@ -34,6 +34,7 @@ import java.io.IOException;
    * @param texturePath Path to the image to use for the texture.
    */
   public Texture(Context context, String texturePath) throws IOException {
+//  public Texture(Context context, Bitmap bitmap) throws IOException {
     GLES20.glGenTextures(1, textureId, 0);
     bind();
     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
@@ -53,3 +54,6 @@ import java.io.IOException;
     GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId[0]);
   }
 }
+
+//Portions of this page are modifications based on work created and shared by Google 
+//and used according to terms described in the Creative Commons 4.0 Attribution License.

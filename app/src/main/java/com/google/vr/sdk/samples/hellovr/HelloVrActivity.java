@@ -23,7 +23,6 @@ import android.util.Log;
 import com.google.vr.ndk.base.Properties;
 import com.google.vr.ndk.base.Properties.PropertyType;
 import com.google.vr.ndk.base.Value;
-import com.google.vr.sdk.audio.GvrAudioEngine;
 import com.google.vr.sdk.base.AndroidCompat;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.GvrActivity;
@@ -56,20 +55,14 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   private static final float[] POS_MATRIX_MULTIPLY_VEC = {0.0f, 0.0f, 0.0f, 1.0f};
   private static final float[] FORWARD_VEC = {0.0f, 0.0f, -1.0f, 1.f};
 
-  private static final float MIN_TARGET_DISTANCE = 3.0f;
-  private static final float MAX_TARGET_DISTANCE = 3.5f;
-
-  private static final String OBJECT_SOUND_FILE = "audio/HelloVR_Loop.ogg";
-  private static final String SUCCESS_SOUND_FILE = "audio/HelloVR_Activation.ogg";
-
   private static final float DEFAULT_FLOOR_HEIGHT = -1.6f;
 
   private static final float ANGLE_LIMIT = 0.2f;
 
   // The maximum yaw and pitch of the target object, in degrees. After hiding the target, its
   // yaw will be within [-MAX_YAW, MAX_YAW] and pitch will be within [-MAX_PITCH, MAX_PITCH].
-  private static final float MAX_YAW = 100.0f;
-  private static final float MAX_PITCH = 25.0f;
+//  private static final float MAX_YAW = 100.0f;
+//  private static final float MAX_PITCH = 25.0f;
 
   private static final String[] OBJECT_VERTEX_SHADER_CODE =
       new String[] {
@@ -102,38 +95,29 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   private int objectUvParam;
   private int objectModelViewProjectionParam;
 
-  private float targetDistance = MAX_TARGET_DISTANCE;
-
   private TexturedMesh room;
-  private Texture roomTex;
-  private ArrayList<TexturedMesh> targetObjectMeshes;
-  private ArrayList<Texture> targetObjectNotSelectedTextures;
-  private ArrayList<Texture> targetObjectSelectedTextures;
+  protected Texture roomTex;
   private int curTargetObject;
 
   private Random random;
 
-  private float[] targetPosition;
   private float[] camera;
   private float[] view;
   private float[] headView;
   private float[] modelViewProjection;
   private float[] modelView;
 
-  private float[] modelTarget;
   private float[] modelRoom;
 
   private float[] tempPosition;
   private float[] headRotation;
 
-  private GvrAudioEngine gvrAudioEngine;
-  private volatile int sourceId = GvrAudioEngine.INVALID_ID;
-  private volatile int successSourceId = GvrAudioEngine.INVALID_ID;
-
   private Properties gvrProperties;
   // This is an opaque wrapper around an internal GVR property. It is set via Properties and
   // should be shutdown via a {@link Value#close()} call when no longer needed.
   private final Value floorHeight = new Value();
+
+  private StreetViewLoader sVLoader;
 
   /**
    * Sets the view to our GvrView and initializes the transformation matrices we will use
@@ -145,20 +129,17 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
     initializeGvrView();
 
+    sVLoader = new StreetViewLoader(this);
+
     camera = new float[16];
     view = new float[16];
     modelViewProjection = new float[16];
     modelView = new float[16];
     // Target object first appears directly in front of user.
-    targetPosition = new float[] {0.0f, 0.0f, -MIN_TARGET_DISTANCE};
     tempPosition = new float[4];
     headRotation = new float[4];
-    modelTarget = new float[16];
     modelRoom = new float[16];
     headView = new float[16];
-
-    // Initialize 3D audio engine.
-    gvrAudioEngine = new GvrAudioEngine(this, GvrAudioEngine.RenderingMode.BINAURAL_HIGH_QUALITY);
 
     random = new Random();
   }
@@ -189,14 +170,12 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
   @Override
   public void onPause() {
-    gvrAudioEngine.pause();
     super.onPause();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    gvrAudioEngine.resume();
   }
 
   @Override
@@ -234,65 +213,16 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     Matrix.setIdentityM(modelRoom, 0);
     Matrix.translateM(modelRoom, 0, 0, DEFAULT_FLOOR_HEIGHT, 0);
 
-    // Avoid any delays during start-up due to decoding of sound files.
-    new Thread(
-            new Runnable() {
-              @Override
-              public void run() {
-                // Start spatial audio playback of OBJECT_SOUND_FILE at the model position. The
-                // returned sourceId handle is stored and allows for repositioning the sound object
-                // whenever the target position changes.
-                gvrAudioEngine.preloadSoundFile(OBJECT_SOUND_FILE);
-                sourceId = gvrAudioEngine.createSoundObject(OBJECT_SOUND_FILE);
-                gvrAudioEngine.setSoundObjectPosition(
-                    sourceId, targetPosition[0], targetPosition[1], targetPosition[2]);
-                gvrAudioEngine.playSound(sourceId, true /* looped playback */);
-                // Preload an unspatialized sound to be played on a successful trigger on the
-                // target.
-                gvrAudioEngine.preloadSoundFile(SUCCESS_SOUND_FILE);
-              }
-            })
-        .start();
-
-    updateTargetPosition();
-
     Util.checkGlError("onSurfaceCreated");
 
     try {
-      room = new TexturedMesh(this, "CubeRoom.obj", objectPositionParam, objectUvParam);
+      String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key=AIzaSyALPfhhnemi3xC4-FUtHkWidaugsZTwJq4";
+//      sVLoader.execute(tempURL);
+      room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
       roomTex = new Texture(this, "CubeRoom_BakedDiffuse.png");
-      targetObjectMeshes = new ArrayList<>();
-      targetObjectNotSelectedTextures = new ArrayList<>();
-      targetObjectSelectedTextures = new ArrayList<>();
-      targetObjectMeshes.add(
-          new TexturedMesh(this, "Icosahedron.obj", objectPositionParam, objectUvParam));
-      targetObjectNotSelectedTextures.add(new Texture(this, "Icosahedron_Blue_BakedDiffuse.png"));
-      targetObjectSelectedTextures.add(new Texture(this, "Icosahedron_Pink_BakedDiffuse.png"));
-      targetObjectMeshes.add(
-          new TexturedMesh(this, "QuadSphere.obj", objectPositionParam, objectUvParam));
-      targetObjectNotSelectedTextures.add(new Texture(this, "QuadSphere_Blue_BakedDiffuse.png"));
-      targetObjectSelectedTextures.add(new Texture(this, "QuadSphere_Pink_BakedDiffuse.png"));
-      targetObjectMeshes.add(
-          new TexturedMesh(this, "TriSphere.obj", objectPositionParam, objectUvParam));
-      targetObjectNotSelectedTextures.add(new Texture(this, "TriSphere_Blue_BakedDiffuse.png"));
-      targetObjectSelectedTextures.add(new Texture(this, "TriSphere_Pink_BakedDiffuse.png"));
     } catch (IOException e) {
       Log.e(TAG, "Unable to initialize objects", e);
     }
-    curTargetObject = random.nextInt(TARGET_MESH_COUNT);
-  }
-
-  /** Updates the target object position. */
-  private void updateTargetPosition() {
-    Matrix.setIdentityM(modelTarget, 0);
-    Matrix.translateM(modelTarget, 0, targetPosition[0], targetPosition[1], targetPosition[2]);
-
-    // Update the sound location to match it with the new target position.
-    if (sourceId != GvrAudioEngine.INVALID_ID) {
-      gvrAudioEngine.setSoundObjectPosition(
-          sourceId, targetPosition[0], targetPosition[1], targetPosition[2]);
-    }
-    Util.checkGlError("updateTargetPosition");
   }
 
   /**
@@ -313,13 +243,7 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
     headTransform.getHeadView(headView, 0);
 
-    // Update the 3d audio engine with the most recent head rotation.
     headTransform.getQuaternion(headRotation, 0);
-    gvrAudioEngine.setHeadRotation(
-        headRotation[0], headRotation[1], headRotation[2], headRotation[3]);
-    // Regular update call to GVR audio engine.
-    gvrAudioEngine.update();
-
     Util.checkGlError("onNewFrame");
   }
 
@@ -343,9 +267,7 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     // for calculating the position of the target object.
     float[] perspective = eye.getPerspective(Z_NEAR, Z_FAR);
 
-    Matrix.multiplyMM(modelView, 0, view, 0, modelTarget, 0);
     Matrix.multiplyMM(modelViewProjection, 0, perspective, 0, modelView, 0);
-    drawTarget();
 
     // Set modelView for the room, so it's drawn in the correct location
     Matrix.multiplyMM(modelView, 0, view, 0, modelRoom, 0);
@@ -355,19 +277,6 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
   @Override
   public void onFinishFrame(Viewport viewport) {}
-
-  /** Draw the target object. */
-  public void drawTarget() {
-    GLES20.glUseProgram(objectProgram);
-    GLES20.glUniformMatrix4fv(objectModelViewProjectionParam, 1, false, modelViewProjection, 0);
-    if (isLookingAtTarget()) {
-      targetObjectSelectedTextures.get(curTargetObject).bind();
-    } else {
-      targetObjectNotSelectedTextures.get(curTargetObject).bind();
-    }
-    targetObjectMeshes.get(curTargetObject).draw();
-    Util.checkGlError("drawTarget");
-  }
 
   /** Draw the room. */
   public void drawRoom() {
@@ -384,51 +293,8 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   @Override
   public void onCardboardTrigger() {
     Log.i(TAG, "onCardboardTrigger");
-
-    if (isLookingAtTarget()) {
-      successSourceId = gvrAudioEngine.createStereoSound(SUCCESS_SOUND_FILE);
-      gvrAudioEngine.playSound(successSourceId, false /* looping disabled */);
-      hideTarget();
-    }
-  }
-
-  /** Find a new random position for the target object. */
-  private void hideTarget() {
-    float[] rotationMatrix = new float[16];
-    float[] posVec = new float[4];
-
-    // Matrix.setRotateM takes the angle in degrees, but Math.tan takes the angle in radians, so
-    // yaw is in degrees and pitch is in radians.
-    float yawDegrees = (random.nextFloat() - 0.5f) * 2.0f * MAX_YAW;
-    float pitchRadians = (float) Math.toRadians((random.nextFloat() - 0.5f) * 2.0f * MAX_PITCH);
-
-    Matrix.setRotateM(rotationMatrix, 0, yawDegrees, 0.0f, 1.0f, 0.0f);
-    targetDistance =
-        random.nextFloat() * (MAX_TARGET_DISTANCE - MIN_TARGET_DISTANCE) + MIN_TARGET_DISTANCE;
-    targetPosition = new float[] {0.0f, 0.0f, -targetDistance};
-    Matrix.setIdentityM(modelTarget, 0);
-    Matrix.translateM(modelTarget, 0, targetPosition[0], targetPosition[1], targetPosition[2]);
-    Matrix.multiplyMV(posVec, 0, rotationMatrix, 0, modelTarget, 12);
-
-    targetPosition[0] = posVec[0];
-    targetPosition[1] = (float) Math.tan(pitchRadians) * targetDistance;
-    targetPosition[2] = posVec[2];
-
-    updateTargetPosition();
-    curTargetObject = random.nextInt(TARGET_MESH_COUNT);
-  }
-
-  /**
-   * Check if user is looking at the target object by calculating where the object is in eye-space.
-   *
-   * @return true if the user is looking at the target object.
-   */
-  private boolean isLookingAtTarget() {
-    // Convert object space to camera space. Use the headView from onNewFrame.
-    Matrix.multiplyMM(modelView, 0, headView, 0, modelTarget, 0);
-    Matrix.multiplyMV(tempPosition, 0, modelView, 0, POS_MATRIX_MULTIPLY_VEC, 0);
-
-    float angle = Util.angleBetweenVectors(tempPosition, FORWARD_VEC);
-    return angle < ANGLE_LIMIT;
   }
 }
+
+//Portions of this page are modifications based on work created and shared by Google
+// and used according to terms described in the Creative Commons 4.0 Attribution License.
