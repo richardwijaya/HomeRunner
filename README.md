@@ -1,4 +1,4 @@
-# RunnerGo
+# HomeRunner
 
 Enables Daydream and Cardboard app development on Android.
 
