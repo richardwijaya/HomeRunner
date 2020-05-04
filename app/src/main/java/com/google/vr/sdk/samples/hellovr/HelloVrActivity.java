@@ -16,6 +16,11 @@
 
 package com.google.vr.sdk.samples.hellovr;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
@@ -43,7 +48,7 @@ import javax.microedition.khronos.egl.EGLConfig;
  * Daydream mode, the user can use the controller to position the cursor, and use the controller
  * buttons to invoke the trigger action.
  */
-public class HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer {
+public class HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
   private static final String TAG = "HelloVrActivity";
 
   private static final int TARGET_MESH_COUNT = 3;
@@ -65,29 +70,29 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 //  private static final float MAX_PITCH = 25.0f;
 
   private static final String[] OBJECT_VERTEX_SHADER_CODE =
-      new String[] {
-        "uniform mat4 u_MVP;",
-        "attribute vec4 a_Position;",
-        "attribute vec2 a_UV;",
-        "varying vec2 v_UV;",
-        "",
-        "void main() {",
-        "  v_UV = a_UV;",
-        "  gl_Position = u_MVP * a_Position;",
-        "}",
-      };
+          new String[] {
+                  "uniform mat4 u_MVP;",
+                  "attribute vec4 a_Position;",
+                  "attribute vec2 a_UV;",
+                  "varying vec2 v_UV;",
+                  "",
+                  "void main() {",
+                  "  v_UV = a_UV;",
+                  "  gl_Position = u_MVP * a_Position;",
+                  "}",
+          };
   private static final String[] OBJECT_FRAGMENT_SHADER_CODE =
-      new String[] {
-        "precision mediump float;",
-        "varying vec2 v_UV;",
-        "uniform sampler2D u_Texture;",
-        "",
-        "void main() {",
-        "  // The y coordinate of this sample's textures is reversed compared to",
-        "  // what OpenGL expects, so we invert the y coordinate.",
-        "  gl_FragColor = texture2D(u_Texture, vec2(v_UV.x, 1.0 - v_UV.y));",
-        "}",
-      };
+          new String[] {
+                  "precision mediump float;",
+                  "varying vec2 v_UV;",
+                  "uniform sampler2D u_Texture;",
+                  "",
+                  "void main() {",
+                  "  // The y coordinate of this sample's textures is reversed compared to",
+                  "  // what OpenGL expects, so we invert the y coordinate.",
+                  "  gl_FragColor = texture2D(u_Texture, vec2(v_UV.x, 1.0 - v_UV.y));",
+                  "}",
+          };
 
   private int objectProgram;
 
@@ -117,7 +122,11 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   // should be shutdown via a {@link Value#close()} call when no longer needed.
   private final Value floorHeight = new Value();
 
-  private StreetViewLoader sVLoader;
+  private SensorManager sensorManager;
+  private Sensor stepDetector;
+
+
+//  private StreetViewLoader sVLoader;
 
   /**
    * Sets the view to our GvrView and initializes the transformation matrices we will use
@@ -127,9 +136,14 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+
+    sensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_FASTEST);
+
     initializeGvrView();
 
-    sVLoader = new StreetViewLoader(this);
+//    sVLoader = new StreetViewLoader(this);
 
     camera = new float[16];
     view = new float[16];
@@ -294,7 +308,20 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   public void onCardboardTrigger() {
     Log.i(TAG, "onCardboardTrigger");
   }
+
+  @Override
+  public void onSensorChanged(SensorEvent sensorEvent) {
+    if(sensorEvent.sensor == this.stepDetector)
+      Log.d("step detector","step taken");
+  }
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int i) {
+
+  }
 }
+
+
 
 //Portions of this page are modifications based on work created and shared by Google
 // and used according to terms described in the Creative Commons 4.0 Attribution License.
