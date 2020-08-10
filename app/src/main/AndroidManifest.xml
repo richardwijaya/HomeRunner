@@ -29,14 +29,17 @@
         android:label="HelloVrActivity"
         android:supportsRtl="true"
         android:theme="@style/VrActivityTheme">
-<!--        <activity android:name=".MainActivity">-->
 
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
+        <activity android:name=".MainActivity">
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
         <activity
             android:name=".HelloVrActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|navigation|density"
@@ -57,9 +60,9 @@
                 android:resource="@drawable/hello_vr_icon_back" />
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
 
                 <category android:name="com.google.intent.category.CARDBOARD" />
 
@@ -72,6 +75,7 @@
                 <category android:name="com.google.intent.category.DAYDREAM" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

@@ -126,7 +126,7 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   private Sensor stepDetector;
 
 
-//  private StreetViewLoader sVLoader;
+  private StreetViewLoader sVLoader;
 
   /**
    * Sets the view to our GvrView and initializes the transformation matrices we will use
@@ -230,10 +230,10 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     Util.checkGlError("onSurfaceCreated");
 
     try {
-      String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key=AIzaSyALPfhhnemi3xC4-FUtHkWidaugsZTwJq4";
+//      String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key=AIzaSyALPfhhnemi3xC4-FUtHkWidaugsZTwJq4";
 //      sVLoader.execute(tempURL);
       room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
-      roomTex = new Texture(this, "CubeRoom_BakedDiffuse.png");
+      roomTex = new Texture(this, "whole_streetview.png");
     } catch (IOException e) {
       Log.e(TAG, "Unable to initialize objects", e);
     }
