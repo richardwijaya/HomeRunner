@@ -13,7 +13,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity implements View.OnClickListener {
 
     protected EditText originET, destET;
-    protected TextView fromTV, toTV;
+    protected TextView oriTV, destTV;
     protected Button startButton;
 
     @Override
@@ -25,6 +25,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         originET = (EditText) findViewById(R.id.originET);
         destET = (EditText) findViewById(R.id.destET);
+
+        oriTV = (TextView) findViewById(R.id.originTV);
+        destTV = (TextView) findViewById(R.id.destTV);
+
+        oriTV.setText("Origin");
+        destTV.setText("Destination");
+
+
+        startButton.setText("Start Running");
 
         startButton.setOnClickListener(this);
     }

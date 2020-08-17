@@ -17,6 +17,7 @@
 package com.google.vr.sdk.samples.hellovr;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,7 +36,6 @@ import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 import javax.microedition.khronos.egl.EGLConfig;
 
@@ -102,7 +102,6 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
   private TexturedMesh room;
   protected Texture roomTex;
-  private int curTargetObject;
 
   private Random random;
 
@@ -128,13 +127,24 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
   private StreetViewLoader sVLoader;
 
+  private Bitmap sVBitmap;
+
   /**
    * Sets the view to our GvrView and initializes the transformation matrices we will use
    * to render our scene.
    */
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    sVLoader = new StreetViewLoader();
+
+    String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key);
+    sVLoader.execute(tempURL);
+
+    sVBitmap = sVLoader.getStreetViewBitmap();
+
     super.onCreate(savedInstanceState);
+
+
 
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -142,8 +152,6 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     sensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_FASTEST);
 
     initializeGvrView();
-
-//    sVLoader = new StreetViewLoader(this);
 
     camera = new float[16];
     view = new float[16];
@@ -230,10 +238,9 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     Util.checkGlError("onSurfaceCreated");
 
     try {
-//      String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key=AIzaSyALPfhhnemi3xC4-FUtHkWidaugsZTwJq4";
-//      sVLoader.execute(tempURL);
       room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
-      roomTex = new Texture(this, "whole_streetview.png");
+//      roomTex = new Texture(this, "whole_streetview.png");
+      roomTex = new Texture(this, sVBitmap);
     } catch (IOException e) {
       Log.e(TAG, "Unable to initialize objects", e);
     }

@@ -24,7 +24,8 @@ import android.opengl.GLUtils;
 import java.io.IOException;
 
 /** A texture, meant for use with TexturedMesh. */
-/* package */ class Texture {
+
+class Texture {
   private final int[] textureId = new int[1];
 
   /**
@@ -45,6 +46,20 @@ import java.io.IOException;
     Bitmap textureBitmap = BitmapFactory.decodeStream(context.getAssets().open(texturePath));
     GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, textureBitmap, 0);
     textureBitmap.recycle();
+    GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+  }
+
+  public Texture(Context context, Bitmap bitmap) throws IOException {
+//  public Texture(Context context, Bitmap bitmap) throws IOException {
+    GLES20.glGenTextures(1, textureId, 0);
+    bind();
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+    GLES20.glTexParameteri(
+            GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_NEAREST);
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+    bitmap.recycle();
     GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
   }
 

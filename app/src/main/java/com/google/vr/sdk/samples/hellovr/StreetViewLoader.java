@@ -15,10 +15,14 @@ import java.net.URL;
 public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
 
     protected Bitmap streetViewBitmap;
-    protected Activity activity;
+//    protected Activity activity;
 
-    public StreetViewLoader(Activity activity){
-        this.activity = activity;
+//    public StreetViewLoader(Activity activity){
+//        this.activity = activity;
+//    }
+
+    public StreetViewLoader(){
+
     }
 
     @Override
@@ -48,28 +52,22 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
         streetViewBitmap = allBitmap;
 
 
-        File file = new File(activity.getCacheDir(), "whole_streetview.png");
-
-        FileOutputStream fOS;
-
-        try {
-            fOS = new FileOutputStream(file);
-            allBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
-        }catch(Exception e){
-
-        }
+//        File file = new File(activity.getCacheDir(), "whole_streetview.png");
+//
+//        FileOutputStream fOS;
+//
+//        try {
+//            fOS = new FileOutputStream(file);
+//            allBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
+//        }catch(Exception e){
+//
+//        }
 
 
         return null;
     }
 
-//    @Override
-//    protected void onPostExecute(Void aVoid) {
-//        activity.theBitmap = streetViewBitmap;
-//        activity.imgView.setImageBitmap(streetViewBitmap);
-//    }
-
-//    protected Bitmap getStreetViewBitmap(){
-//        return streetViewBitmap;
-//    }
+    protected Bitmap getStreetViewBitmap(){
+        return streetViewBitmap;
+    }
 }
