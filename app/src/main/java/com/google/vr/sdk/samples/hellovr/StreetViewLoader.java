@@ -9,20 +9,20 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
 
     protected Bitmap streetViewBitmap;
-//    protected Activity activity;
+    protected HelloVrActivity activity;
+    protected int objectPositionParam, objectUvParam;
 
-//    public StreetViewLoader(Activity activity){
-//        this.activity = activity;
-//    }
-
-    public StreetViewLoader(){
-
+    public StreetViewLoader(HelloVrActivity activity, int objectPositionParam,int objectUvParam){
+        this.activity = activity;
+        this.objectPositionParam = objectPositionParam;
+        this.objectUvParam = objectUvParam;
     }
 
     @Override
@@ -67,7 +67,18 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
         return null;
     }
 
-    protected Bitmap getStreetViewBitmap(){
-        return streetViewBitmap;
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        try {
+            activity.room = new TexturedMesh(activity, "Room.obj", objectPositionParam, objectUvParam);
+//      roomTex = new Texture(this, "whole_streetview.png");
+            activity.roomTex = new Texture(streetViewBitmap);
+        } catch (IOException e) {
+//            Log.e(TAG, "Unable to initialize objects", e);
+        }
     }
+
+//    protected Bitmap getStreetViewBitmap(){
+//        return streetViewBitmap;
+//    }
 }

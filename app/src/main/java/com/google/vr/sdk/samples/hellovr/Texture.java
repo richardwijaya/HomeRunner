@@ -49,8 +49,7 @@ class Texture {
     GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
   }
 
-  public Texture(Context context, Bitmap bitmap) throws IOException {
-//  public Texture(Context context, Bitmap bitmap) throws IOException {
+  public Texture(Bitmap bitmap) throws IOException {
     GLES20.glGenTextures(1, textureId, 0);
     bind();
     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);

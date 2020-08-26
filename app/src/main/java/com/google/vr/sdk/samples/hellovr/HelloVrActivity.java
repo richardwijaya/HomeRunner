@@ -100,7 +100,7 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   private int objectUvParam;
   private int objectModelViewProjectionParam;
 
-  private TexturedMesh room;
+  protected TexturedMesh room;
   protected Texture roomTex;
 
   private Random random;
@@ -135,16 +135,9 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
    */
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    sVLoader = new StreetViewLoader();
-
-    String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key);
-    sVLoader.execute(tempURL);
-
-    sVBitmap = sVLoader.getStreetViewBitmap();
+    Log.i(TAG,"onCreate");
 
     super.onCreate(savedInstanceState);
-
-
 
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -162,8 +155,6 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     headRotation = new float[4];
     modelRoom = new float[16];
     headView = new float[16];
-
-    random = new Random();
   }
 
   public void initializeGvrView() {
@@ -237,14 +228,17 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
 
     Util.checkGlError("onSurfaceCreated");
 
-    try {
-      room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
-//      roomTex = new Texture(this, "whole_streetview.png");
-      roomTex = new Texture(this, sVBitmap);
-    } catch (IOException e) {
-      Log.e(TAG, "Unable to initialize objects", e);
-    }
+    sVLoader = new StreetViewLoader(this, objectPositionParam, objectUvParam);
+
+    String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key);
+
+    sVLoader.execute(tempURL);
+
   }
+
+//  public void setRoom(TexturedMesh tMesh){
+    //    this.room = tMesh;
+//  }
 
   /**
    * Prepares OpenGL ESm before we draw a frame.
