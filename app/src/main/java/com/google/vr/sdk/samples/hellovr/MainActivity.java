@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected EditText originET, destET;
     protected TextView oriTV, destTV;
     protected Button startButton;
+    protected StreetViewLoader sVLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +43,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if(view.getId() == startButton.getId()){
-            Intent intent = new Intent(this,HelloVrActivity.class);
-
-            startActivity(intent);
+            sVLoader = new StreetViewLoader(new Intent(this, HelloVrActivity.class), this);
+            String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+ originET.getText().toString() +"&key="+ getString(R.string.key);
+            Log.d("URL",tempURL);
+            sVLoader.execute(tempURL);
         }
     }
 }

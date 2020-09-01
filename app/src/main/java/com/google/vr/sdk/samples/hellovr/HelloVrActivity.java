@@ -48,7 +48,7 @@ import javax.microedition.khronos.egl.EGLConfig;
  * Daydream mode, the user can use the controller to position the cursor, and use the controller
  * buttons to invoke the trigger action.
  */
-public class HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
+public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
   private static final String TAG = "HelloVrActivity";
 
   private static final int TARGET_MESH_COUNT = 3;
@@ -136,6 +136,8 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
   @Override
   public void onCreate(Bundle savedInstanceState) {
     Log.i(TAG,"onCreate");
+
+
 
     super.onCreate(savedInstanceState);
 
@@ -226,19 +228,15 @@ public class HelloVrActivity extends GvrActivity implements GvrView.StereoRender
     Matrix.setIdentityM(modelRoom, 0);
     Matrix.translateM(modelRoom, 0, 0, DEFAULT_FLOOR_HEIGHT, 0);
 
-    Util.checkGlError("onSurfaceCreated");
+    String filepath = getIntent().getStringExtra("bitmap_texture");
 
-    sVLoader = new StreetViewLoader(this, objectPositionParam, objectUvParam);
-
-    String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key);
-
-    sVLoader.execute(tempURL);
-
+    try {
+      room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
+      roomTex = new Texture(this, filepath);
+    } catch (IOException e) {
+      Log.e(TAG, "Unable to initialize objects", e);
+    }
   }
-
-//  public void setRoom(TexturedMesh tMesh){
-    //    this.room = tMesh;
-//  }
 
   /**
    * Prepares OpenGL ESm before we draw a frame.

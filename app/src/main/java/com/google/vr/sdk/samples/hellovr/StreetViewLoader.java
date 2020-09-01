@@ -1,6 +1,8 @@
 package com.google.vr.sdk.samples.hellovr;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,14 +17,15 @@ import java.net.URL;
 
 public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
 
+    protected String filePath;
     protected Bitmap streetViewBitmap;
-    protected HelloVrActivity activity;
-    protected int objectPositionParam, objectUvParam;
+    protected Activity activity;
+    protected Intent intent;
 
-    public StreetViewLoader(HelloVrActivity activity, int objectPositionParam,int objectUvParam){
+    public StreetViewLoader(Intent intent, Activity activity){
+        this.intent = intent;
         this.activity = activity;
-        this.objectPositionParam = objectPositionParam;
-        this.objectUvParam = objectUvParam;
+        filePath = "whole_streetview.png";
     }
 
     @Override
@@ -51,34 +54,29 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
         }
         streetViewBitmap = allBitmap;
 
-
-//        File file = new File(activity.getCacheDir(), "whole_streetview.png");
-//
-//        FileOutputStream fOS;
-//
-//        try {
-//            fOS = new FileOutputStream(file);
-//            allBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
-//        }catch(Exception e){
-//
-//        }
-
+        try {
+            File file = new File(activity.getCacheDir(), filePath);
+            if(file.exists()){
+                file.delete();
+                file = new File(activity.getCacheDir(), filePath);
+            }
+            Log.d("File Created","Okay");
+            FileOutputStream fOS = new FileOutputStream(file);
+            allBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
+            fOS.flush();
+            fOS.close();
+        }catch(Exception e){
+            Log.e("Create File", "Failed");
+        }
 
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        try {
-            activity.room = new TexturedMesh(activity, "Room.obj", objectPositionParam, objectUvParam);
-//      roomTex = new Texture(this, "whole_streetview.png");
-            activity.roomTex = new Texture(streetViewBitmap);
-        } catch (IOException e) {
-//            Log.e(TAG, "Unable to initialize objects", e);
-        }
+        Log.i("OnPostExecute", "Okay");
+        intent.putExtra("bitmap_texture", filePath);
+        activity.startActivity(intent);
     }
 
-//    protected Bitmap getStreetViewBitmap(){
-//        return streetViewBitmap;
-//    }
 }
