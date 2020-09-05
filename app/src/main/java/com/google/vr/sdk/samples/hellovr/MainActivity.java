@@ -44,9 +44,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         if(view.getId() == startButton.getId()){
             sVLoader = new StreetViewLoader(new Intent(this, HelloVrActivity.class), this);
-            String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+ originET.getText().toString() +"&key="+ getString(R.string.key);
-            Log.d("URL",tempURL);
-            sVLoader.execute(tempURL);
+
+            int urlLength = 4;
+
+            int heading = 0;
+
+            String urlArr[] = new String[urlLength];
+
+            String tempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+ originET.getText().toString() +"&key="+ getString(R.string.key)
+                    + "&heading=";
+
+            for(int i = 0 ; i < urlLength ; i++){
+                urlArr[i] = tempURL + heading;
+                heading += 90;
+            }
+
+            sVLoader.execute(urlArr);
         }
     }
 }

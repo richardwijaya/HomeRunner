@@ -19,12 +19,12 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
 
     protected String filePath;
     protected Bitmap streetViewBitmap;
-    protected Activity activity;
+    protected MainActivity mainActivity;
     protected Intent intent;
 
-    public StreetViewLoader(Intent intent, Activity activity){
+    public StreetViewLoader(Intent intent, MainActivity mainActivity){
         this.intent = intent;
-        this.activity = activity;
+        this.mainActivity = mainActivity;
         filePath = "whole_streetview.png";
     }
 
@@ -41,7 +41,8 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
 
             }
         }
-        int width = bitmaps[0].getWidth(), height = bitmaps[0].getHeight();
+        int width = bitmaps[0].getWidth();
+        int height = bitmaps[0].getHeight();
 
         width *= bitmaps.length;
 
@@ -55,14 +56,14 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
         streetViewBitmap = allBitmap;
 
         try {
-            File file = new File(activity.getCacheDir(), filePath);
+            File file = new File(mainActivity.getCacheDir(), filePath);
             if(file.exists()){
                 file.delete();
-                file = new File(activity.getCacheDir(), filePath);
+                file = new File(mainActivity.getCacheDir(), filePath);
             }
             Log.d("File Created","Okay");
             FileOutputStream fOS = new FileOutputStream(file);
-            allBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
+            streetViewBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
             fOS.flush();
             fOS.close();
         }catch(Exception e){
@@ -75,8 +76,9 @@ public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         Log.i("OnPostExecute", "Okay");
+        mainActivity.originET.setText("");
         intent.putExtra("bitmap_texture", filePath);
-        activity.startActivity(intent);
+        mainActivity.startActivity(intent);
     }
 
 }
