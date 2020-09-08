@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class StreetViewLoader extends AsyncTask<String, Bitmap, Void> {
+public class StreetViewLoader extends AsyncTask<String, Void, Void> {
 
     protected String filePath;
     protected Bitmap streetViewBitmap;

@@ -51,6 +51,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
   private static final String TAG = "HelloVrActivity";
 
+  private static final float STEP = 0.7f;
+
   private static final int TARGET_MESH_COUNT = 3;
 
   private static final float Z_NEAR = 0.01f;
@@ -137,11 +139,9 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   public void onCreate(Bundle savedInstanceState) {
     Log.i(TAG,"onCreate");
 
-
-
     super.onCreate(savedInstanceState);
 
-    sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
     stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
     sensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_FASTEST);
@@ -311,7 +311,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     if(sensorEvent.sensor == this.stepDetector)
-      Log.d("step detector","step taken");
+      Log.i("step detector","step taken");
   }
 
   @Override
