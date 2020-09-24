@@ -19,12 +19,17 @@ public class StreetViewLoader extends AsyncTask<String, Void, Void> {
 
     protected String filePath;
     protected Bitmap streetViewBitmap;
-    protected MainActivity mainActivity;
+    protected Activity activity;
     protected Intent intent;
 
-    public StreetViewLoader(Intent intent, MainActivity mainActivity){
+    public StreetViewLoader(Intent intent, Activity activity){
         this.intent = intent;
-        this.mainActivity = mainActivity;
+        this.activity = activity;
+        filePath = "whole_streetview.png";
+    }
+
+    public StreetViewLoader(Activity activity){
+        this.activity = activity;
         filePath = "whole_streetview.png";
     }
 
@@ -56,10 +61,10 @@ public class StreetViewLoader extends AsyncTask<String, Void, Void> {
         streetViewBitmap = allBitmap;
 
         try {
-            File file = new File(mainActivity.getCacheDir(), filePath);
+            File file = new File(activity.getCacheDir(), filePath);
             if(file.exists()){
                 file.delete();
-                file = new File(mainActivity.getCacheDir(), filePath);
+                file = new File(activity.getCacheDir(), filePath);
             }
             Log.d("File Created","Okay");
             FileOutputStream fOS = new FileOutputStream(file);
@@ -75,10 +80,26 @@ public class StreetViewLoader extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        Log.i("OnPostExecute", "Okay");
-        mainActivity.originET.setText("");
+        if(activity instanceof MainActivity){
+            cleanUpMainActivity();
+        }else{
+            cleanUpVrActivity();
+        }
+    }
+
+    protected void cleanUpMainActivity(){
+        ((MainActivity) activity).originET.setText("");
+        ((MainActivity) activity).destET.setText("");
         intent.putExtra("bitmap_texture", filePath);
-        mainActivity.startActivity(intent);
+        activity.startActivity(intent);
+    }
+
+    protected void cleanUpVrActivity(){
+        try {
+
+        }catch (Exception e){
+
+        }
     }
 
 }

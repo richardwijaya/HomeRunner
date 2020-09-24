@@ -47,19 +47,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             DirectionsLoader dirLoader = new DirectionsLoader(this);
 
-            int svUrlLength = 4;
-
-            int heading = 0;
-
-            String urlArr[] = new String[svUrlLength];
-
-            String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+ originET.getText().toString() +"&key="+ getString(R.string.key)
-                    + "&heading=";
-
-            for(int i = 0 ; i < svUrlLength ; i++){
-                urlArr[i] = svTempURL + heading;
-                heading += 90;
-            }
+            String urlArr[] = generateStreetViewURL(4);
 
             String dirURL = "https://maps.googleapis.com/maps/api/directions/json?" +
                     "mode=walking&origin=" + originET.getText().toString() + "&destination=" +
@@ -69,5 +57,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             sVLoader.execute(urlArr);
         }
+    }
+
+    protected String[] generateStreetViewURL(int svUrlLength){
+        int heading = 0;
+
+        String[] urlArr = new String[svUrlLength];
+
+        String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+ originET.getText().toString() +"&key="+ getString(R.string.key)
+                + "&heading=";
+
+        for(int i = 0 ; i < svUrlLength ; i++){
+            urlArr[i] = svTempURL + heading;
+            heading += 90;
+        }
+
+        return urlArr;
     }
 }

@@ -24,6 +24,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import com.google.vr.ndk.base.Properties;
@@ -105,8 +106,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   protected TexturedMesh room;
   protected Texture roomTex;
 
-  private Random random;
-
   private float[] camera;
   private float[] view;
   private float[] headView;
@@ -140,6 +139,8 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     Log.i(TAG,"onCreate");
 
     super.onCreate(savedInstanceState);
+
+    sVLoader = new StreetViewLoader(this);
 
     sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
     stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -310,13 +311,47 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
-    if(sensorEvent.sensor == this.stepDetector)
+    if(sensorEvent.sensor == this.stepDetector){
       Log.i("step detector","step taken");
+
+      Log.i("AsynTask Status", sVLoader.getStatus().toString());
+
+      if(sVLoader.getStatus() == AsyncTask.Status.PENDING){
+        int heading = 0;
+
+        int svUrlLength = 4;
+
+        String[] urlArr = new String[svUrlLength];
+
+        String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key)
+                + "&heading=";
+
+        for(int j = 0 ; j < svUrlLength ; j++){
+          urlArr[j] = svTempURL + heading;
+          heading += 90;
+        }
+
+        sVLoader.execute(urlArr);
+
+
+        if(sVLoader.getStatus() == AsyncTask.Status.FINISHED){
+          try{
+            roomTex = new Texture(this, getIntent().getStringExtra("bitmap_texture"));
+          }catch (Exception ex){
+
+          }
+
+          drawRoom();
+        }
+      }
+
+    }
+
+
   }
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int i) {
-
   }
 }
 
