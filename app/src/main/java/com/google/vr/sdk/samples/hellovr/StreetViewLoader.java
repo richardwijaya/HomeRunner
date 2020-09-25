@@ -96,6 +96,8 @@ public class StreetViewLoader extends AsyncTask<String, Void, Void> {
 
     protected void cleanUpVrActivity(){
         try {
+            ((HelloVrActivity)activity).roomTex = new Texture(activity, activity.getIntent().getStringExtra("bitmap_texture"));
+            ((HelloVrActivity)activity).drawRoom();
 
         }catch (Exception e){
 

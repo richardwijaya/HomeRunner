@@ -336,15 +336,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
         sVLoader.execute(urlArr);
 
 
-        if(sVLoader.getStatus() == AsyncTask.Status.FINISHED){
-          try{
-            roomTex = new Texture(this, getIntent().getStringExtra("bitmap_texture"));
-          }catch (Exception ex){
-
-          }
-
-          drawRoom();
-        }
 //      }
 
     }
