@@ -14,3 +14,6 @@ local.properties
 
 # OS configurations.
 .DS_Store
+
+#Credentials
+/app/src/main/res/values/credentials.xml
