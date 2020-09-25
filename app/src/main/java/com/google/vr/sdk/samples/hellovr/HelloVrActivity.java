@@ -126,7 +126,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   private Sensor stepDetector;
 
 
-  private StreetViewLoader sVLoader;
+//  private StreetViewLoader sVLoader;
 
   private Bitmap sVBitmap;
 
@@ -140,7 +140,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
     super.onCreate(savedInstanceState);
 
-    sVLoader = new StreetViewLoader(this);
+//    sVLoader = new StreetViewLoader(this);
 
     sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
     stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -314,9 +314,11 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     if(sensorEvent.sensor == this.stepDetector){
       Log.i("step detector","step taken");
 
-      Log.i("AsynTask Status", sVLoader.getStatus().toString());
+//      Log.i("AsynTask Status", sVLoader.getStatus().toString());
 
-      if(sVLoader.getStatus() == AsyncTask.Status.PENDING){
+      StreetViewLoader sVLoader = new StreetViewLoader(this);
+
+//      if(sVLoader.getStatus() != AsyncTask.Status.RUNNING){
         int heading = 0;
 
         int svUrlLength = 4;
@@ -343,7 +345,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
           drawRoom();
         }
-      }
+//      }
 
     }
 
