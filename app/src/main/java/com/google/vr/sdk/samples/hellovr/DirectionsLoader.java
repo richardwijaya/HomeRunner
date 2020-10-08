@@ -10,22 +10,21 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.Socket;
 import java.net.URL;
 
 public class DirectionsLoader extends AsyncTask<String,Void,Void> {
 
     protected MainActivity mainActivity;
-    protected String filePath;
+    protected String filePath, jsonText;
 
     public DirectionsLoader(MainActivity mainActivity){
         this.mainActivity = mainActivity;
         filePath = "dir_route.json";
+        jsonText = "";
     }
 
     @Override
     protected Void doInBackground(String... strings) {
-        String jsonText = "";
         try {
             URL url = new URL(strings[0]);
 
@@ -37,13 +36,13 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-            String curLine = "";
+            String curLine = bufferedReader.readLine();;
 
             while(curLine != null){
-                curLine = bufferedReader.readLine();
                 jsonText += curLine;
-            }
+                curLine = bufferedReader.readLine();
 
+            }
 
             conn.disconnect();
 
@@ -52,11 +51,17 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
 
         }
 
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
         try {
             File file = new File(mainActivity.getCacheDir(), filePath);
             if(file.exists()){
                 file.delete();
                 file = new File(mainActivity.getCacheDir(), filePath);
+                file.createNewFile();
             }
             FileOutputStream fOS = new FileOutputStream(file);
 
@@ -69,8 +74,5 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
         }catch(Exception e){
             Log.e("Create File", "Failed");
         }
-
-        return null;
     }
-
 }

@@ -24,7 +24,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import com.google.vr.ndk.base.Properties;
@@ -36,8 +35,18 @@ import com.google.vr.sdk.base.GvrActivity;
 import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+
 import javax.microedition.khronos.egl.EGLConfig;
 
 /**
@@ -51,10 +60,6 @@ import javax.microedition.khronos.egl.EGLConfig;
  */
 public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
   private static final String TAG = "HelloVrActivity";
-
-  private static final float STEP = 0.7f;
-
-  private static final int TARGET_MESH_COUNT = 3;
 
   private static final float Z_NEAR = 0.01f;
   private static final float Z_FAR = 10.0f;
@@ -130,6 +135,14 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
   private Bitmap sVBitmap;
 
+  private static final int DISTANCE_PER_STEP = 1;
+
+  private ArrayList<JSONObject> arrSteps;
+
+  private int distanceElapsed;
+  private int curStepIndex;
+  private int curStepDistance;
+
   /**
    * Sets the view to our GvrView and initializes the transformation matrices we will use
    * to render our scene.
@@ -140,12 +153,22 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
     super.onCreate(savedInstanceState);
 
-//    sVLoader = new StreetViewLoader(this);
-
     sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
     stepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
     sensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_FASTEST);
+
+    distanceElapsed = 0;
+    curStepIndex = 0;
+    curStepDistance = 0;
+
+    arrSteps = new ArrayList<>();
+
+    loadJSONDir();
+
+//    sVLoader = new StreetViewLoader(this);
+
+
 
     initializeGvrView();
 
@@ -309,38 +332,105 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     Log.i(TAG, "onCardboardTrigger");
   }
 
+
+  public void loadJSONDir(){
+    File file = new File(getCacheDir(),"dir_route.json");
+
+    String jsonTemp = "";
+
+    JSONObject jsonDir;
+
+    try {
+      BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+
+      String curLine = bufferedReader.readLine();
+
+      while (curLine != null){
+        jsonTemp += curLine;
+        curLine = bufferedReader.readLine();
+      }
+
+      jsonDir = new JSONObject(jsonTemp);
+
+      JSONArray jsonArrRoute = jsonDir.getJSONArray("routes");
+
+      for(int i = 0; i < jsonArrRoute.length(); i++){
+        JSONObject jsonRoute = jsonArrRoute.getJSONObject(i);
+
+        JSONArray jsonArrLegs = jsonRoute.getJSONArray("legs");
+
+        for(int j = 0; j < jsonArrLegs.length(); j++){
+          JSONObject jsonLegs = jsonArrLegs.getJSONObject(j);
+
+          JSONArray jsonArrSteps = jsonLegs.getJSONArray("steps");
+
+          for(int k = 0; k < jsonArrSteps.length(); k++){
+            arrSteps.add(jsonArrSteps.getJSONObject(k));
+          }
+        }
+      }
+      curStepDistance = getDistanceValue();
+    }catch (Exception ex){
+
+    }
+  }
+
+  public int getDistanceValue() throws JSONException {
+      return arrSteps.get(curStepIndex).getJSONObject("distance").getInt("value");
+  }
+
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
+    Log.i("Sensor", "Step Detector");
+    Log.i("Arr Size", ""+ arrSteps.size());
+
     if(sensorEvent.sensor == this.stepDetector){
-      Log.i("step detector","step taken");
+      if(curStepIndex < arrSteps.size()){
+        distanceElapsed += DISTANCE_PER_STEP;
+
+        if(distanceElapsed >= curStepDistance){
+          curStepIndex++;
+
+          try {
+            curStepDistance = getDistanceValue();
+          }catch (Exception ex){
+
+          }
+
+        }
+        if(distanceElapsed >= 50){
+
+        }
 
 //      Log.i("AsynTask Status", sVLoader.getStatus().toString());
 
-      StreetViewLoader sVLoader = new StreetViewLoader(this);
+//      StreetViewLoader sVLoader = new StreetViewLoader(this);
 
 //      if(sVLoader.getStatus() != AsyncTask.Status.RUNNING){
-        int heading = 0;
-
-        int svUrlLength = 4;
-
-        String[] urlArr = new String[svUrlLength];
-
-        String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key)
-                + "&heading=";
-
-        for(int j = 0 ; j < svUrlLength ; j++){
-          urlArr[j] = svTempURL + heading;
-          heading += 90;
-        }
-
-        sVLoader.execute(urlArr);
+//        int heading = 0;
+//
+//        int svUrlLength = 4;
+//
+//        String[] urlArr = new String[svUrlLength];
+//
+//        String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key)
+//                + "&heading=";
+//
+//        for(int j = 0 ; j < svUrlLength ; j++){
+//          urlArr[j] = svTempURL + heading;
+//          heading += 90;
+//        }
+//
+//        sVLoader.execute(urlArr);
 
 
 //      }
+      }
+
+      Log.i("Distance Elapsed",distanceElapsed+"");
+      Log.i("Current Step Distance", curStepDistance+"");
 
     }
-
-
   }
 
   @Override
