@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
@@ -105,10 +106,12 @@ public class StreetViewLoader extends AsyncTask<String, Void, Void> {
         HelloVrActivity activityTemp = (HelloVrActivity) activity;
 
         try {
-            activityTemp.roomTex = new Texture(activity, activity.getIntent().getStringExtra("bitmap_texture"));
-        } catch (Exception e) {
-
+            activityTemp.room = new TexturedMesh(activityTemp, "Room.obj", activityTemp.objectPositionParam, activityTemp.objectUvParam);
+            activityTemp.roomTex = new Texture(activityTemp, filePath);
+        } catch (IOException e) {
+//      Log.e(TAG, "Unable to initialize objects", e);
         }
+        activityTemp.drawRoom();
     }
 
 }

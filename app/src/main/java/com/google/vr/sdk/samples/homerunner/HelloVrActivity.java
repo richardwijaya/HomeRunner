@@ -233,6 +233,8 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     Log.i(TAG, "onSurfaceChanged");
   }
 
+
+
   /**
    * Creates the buffers we use to store information about the 3D world.
    *
@@ -392,17 +394,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
       if(curStepIndex < arrSteps.size()){
         distanceElapsed += DISTANCE_PER_STEP;
 
-        if(distanceElapsed >= curStepDistance){
-          curStepIndex++;
-
-          try {
-            curStepDistance = getDistanceValue();
-          }catch (Exception ex){
-
-          }
-
-        }
-
         if(distanceElapsed % 50 == 0) {
 
           sVLoader = new StreetViewLoader(this);
@@ -413,7 +404,20 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
           String[] urlArr = new String[svUrlLength];
 
-          String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + getIntent().getStringExtra("destination") + "&key=" + getString(R.string.key)
+          String svTempURL;
+
+          double lat = 0, lng = 0;
+
+          try {
+            lat = arrSteps.get(curStepIndex).getJSONObject("end_location").getDouble("lat");
+
+            lng = arrSteps.get(curStepIndex).getJSONObject("end_location").getDouble("lng");
+
+          } catch (Exception ex){
+
+          }
+
+          svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + lat + ","+ lng  + "&key=" + getString(R.string.key)
                   + "&heading=";
 
           for (int j = 0; j < svUrlLength; j++) {
@@ -423,6 +427,10 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
           sVLoader.execute(urlArr);
 
+          curStepIndex++;
+
+        } else if(distanceElapsed >= curStepDistance){
+          curStepIndex++;
         }
       }
 
