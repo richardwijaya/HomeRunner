@@ -1,11 +1,10 @@
-package com.google.vr.sdk.samples.hellovr;
+package com.google.vr.sdk.samples.homerunner;
 
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,7 +42,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if(view.getId() == startButton.getId()){
-            sVLoader = new StreetViewLoader(new Intent(this, HelloVrActivity.class), this);
+            Intent intent = new Intent(this, HelloVrActivity.class);
+
+            intent.putExtra("destination", destET.getText().toString());
+
+            sVLoader = new StreetViewLoader(intent, this);
 
             DirectionsLoader dirLoader = new DirectionsLoader(this);
 

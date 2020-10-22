@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.vr.sdk.samples.hellovr"
+    package="com.google.vr.sdk.samples.homerunner"
     android:versionCode="190204066"
     android:versionName="1.200.0">
     <!-- The GVR SDK requires API 19+ and OpenGL ES 2+. -->
@@ -29,8 +29,9 @@
         android:label="HelloVrActivity"
         android:supportsRtl="true"
         android:theme="@style/VrActivityTheme">
+        android:theme="@style/VrActivityTheme">
 
-        <activity android:name=".MainActivity">
+        <activity android:name="com.google.vr.sdk.samples.homerunner.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +42,7 @@
 
 
         <activity
-            android:name=".HelloVrActivity"
+            android:name="com.google.vr.sdk.samples.homerunner.HelloVrActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|navigation|density"
             android:enableVrMode="@string/gvr_vr_mode_component"
             android:label="@string/app_name"
@@ -72,7 +73,7 @@
                      controller APIs directly, however in this sample app we instead rely on
                      Cardboard trigger emulation.
                 -->
-                <category android:name="com.google.intent.category.DAYDREAM" />
+<!--                <category android:name="com.google.intent.category.DAYDREAM" />-->
             </intent-filter>
         </activity>
 

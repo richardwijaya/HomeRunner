@@ -1,4 +1,4 @@
-package com.google.vr.sdk.samples.hellovr;
+package com.google.vr.sdk.samples.homerunner;
 
 import android.os.AsyncTask;
 import android.util.Log;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.vr.sdk.samples.hellovr;
+package com.google.vr.sdk.samples.homerunner;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -45,7 +45,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
@@ -102,11 +101,11 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
                   "}",
           };
 
-  private int objectProgram;
+  protected int objectProgram;
 
-  private int objectPositionParam;
-  private int objectUvParam;
-  private int objectModelViewProjectionParam;
+  protected int objectPositionParam;
+  protected int objectUvParam;
+  protected int objectModelViewProjectionParam;
 
   protected TexturedMesh room;
   protected Texture roomTex;
@@ -131,11 +130,11 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   private Sensor stepDetector;
 
 
-//  private StreetViewLoader sVLoader;
+  private StreetViewLoader sVLoader;
 
   private Bitmap sVBitmap;
 
-  private static final int DISTANCE_PER_STEP = 1;
+  private static final int DISTANCE_PER_STEP = 10;
 
   private ArrayList<JSONObject> arrSteps;
 
@@ -158,6 +157,8 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
     sensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_FASTEST);
 
+    sVLoader = new StreetViewLoader(this);
+
     distanceElapsed = 0;
     curStepIndex = 0;
     curStepDistance = 0;
@@ -165,10 +166,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     arrSteps = new ArrayList<>();
 
     loadJSONDir();
-
-//    sVLoader = new StreetViewLoader(this);
-
-
 
     initializeGvrView();
 
@@ -186,7 +183,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   public void initializeGvrView() {
     setContentView(R.layout.common_ui);
 
-    GvrView gvrView = (GvrView) findViewById(R.id.gvr_view);
+    GvrView gvrView = findViewById(R.id.gvr_view);
     gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
 
     gvrView.setRenderer(this);
@@ -225,6 +222,14 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
   @Override
   public void onSurfaceChanged(int width, int height) {
+    String filepath = getIntent().getStringExtra("bitmap_texture");
+    try {
+      room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
+      roomTex = new Texture(this, filepath);
+    } catch (IOException e) {
+      Log.e(TAG, "Unable to initialize objects", e);
+    }
+    drawRoom();
     Log.i(TAG, "onSurfaceChanged");
   }
 
@@ -382,7 +387,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     Log.i("Sensor", "Step Detector");
-    Log.i("Arr Size", ""+ arrSteps.size());
 
     if(sensorEvent.sensor == this.stepDetector){
       if(curStepIndex < arrSteps.size()){
@@ -398,33 +402,28 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
           }
 
         }
-        if(distanceElapsed >= 50){
+
+        if(distanceElapsed % 50 == 0) {
+
+          sVLoader = new StreetViewLoader(this);
+
+          int heading = 0;
+
+          int svUrlLength = 4;
+
+          String[] urlArr = new String[svUrlLength];
+
+          String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + getIntent().getStringExtra("destination") + "&key=" + getString(R.string.key)
+                  + "&heading=";
+
+          for (int j = 0; j < svUrlLength; j++) {
+            urlArr[j] = svTempURL + heading;
+            heading += 90;
+          }
+
+          sVLoader.execute(urlArr);
 
         }
-
-//      Log.i("AsynTask Status", sVLoader.getStatus().toString());
-
-//      StreetViewLoader sVLoader = new StreetViewLoader(this);
-
-//      if(sVLoader.getStatus() != AsyncTask.Status.RUNNING){
-//        int heading = 0;
-//
-//        int svUrlLength = 4;
-//
-//        String[] urlArr = new String[svUrlLength];
-//
-//        String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=unpar&key="+ getString(R.string.key)
-//                + "&heading=";
-//
-//        for(int j = 0 ; j < svUrlLength ; j++){
-//          urlArr[j] = svTempURL + heading;
-//          heading += 90;
-//        }
-//
-//        sVLoader.execute(urlArr);
-
-
-//      }
       }
 
       Log.i("Distance Elapsed",distanceElapsed+"");
