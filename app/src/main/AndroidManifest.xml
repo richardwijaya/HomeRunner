@@ -32,14 +32,12 @@
         android:theme="@style/VrActivityTheme">
 
         <activity android:name="com.google.vr.sdk.samples.homerunner.MainActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
         <activity
             android:name="com.google.vr.sdk.samples.homerunner.HelloVrActivity"
@@ -61,12 +59,7 @@
                 android:resource="@drawable/hello_vr_icon_back" />
 
             <intent-filter>
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-
                 <category android:name="com.google.intent.category.CARDBOARD" />
-
                 <!--
                      The DAYDREAM category should only be declared by Activities that are Daydream
                      compatible. Daydream compatible apps should typically use the Daydream
@@ -76,7 +69,5 @@
 <!--                <category android:name="com.google.intent.category.DAYDREAM" />-->
             </intent-filter>
         </activity>
-
     </application>
-
 </manifest>
