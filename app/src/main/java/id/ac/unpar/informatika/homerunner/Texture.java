@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.vr.sdk.samples.homerunner;
+package id.ac.unpar.informatika.homerunner;
 
 import android.content.Context;
 import android.graphics.Bitmap;

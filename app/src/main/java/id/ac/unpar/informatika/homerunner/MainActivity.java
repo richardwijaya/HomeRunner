@@ -1,4 +1,4 @@
-package com.google.vr.sdk.samples.homerunner;
+package id.ac.unpar.informatika.homerunner;
 
 
 import android.app.Activity;

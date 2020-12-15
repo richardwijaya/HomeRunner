@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.vr.sdk.samples.homerunner"
-    android:versionCode="190204066"
-    android:versionName="1.200.0">
+    package="id.ac.unpar.informatika.homerunner"
+    android:versionCode="10000"
+    android:versionName="1.0.0-beta">
     <!-- The GVR SDK requires API 19+ and OpenGL ES 2+. -->
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -29,9 +29,8 @@
         android:label="HelloVrActivity"
         android:supportsRtl="true"
         android:theme="@style/VrActivityTheme">
-        android:theme="@style/VrActivityTheme">
 
-        <activity android:name="com.google.vr.sdk.samples.homerunner.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,7 +39,7 @@
         </activity>
 
         <activity
-            android:name="com.google.vr.sdk.samples.homerunner.HelloVrActivity"
+            android:name="id.ac.unpar.informatika.homerunner.HelloVrActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|navigation|density"
             android:enableVrMode="@string/gvr_vr_mode_component"
             android:label="@string/app_name"

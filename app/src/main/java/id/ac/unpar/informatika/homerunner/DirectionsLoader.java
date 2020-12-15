@@ -1,4 +1,4 @@
-package com.google.vr.sdk.samples.homerunner;
+package id.ac.unpar.informatika.homerunner;
 
 import android.os.AsyncTask;
 import android.util.Log;
