@@ -16,4 +16,4 @@ local.properties
 .DS_Store
 
 #Credentials
-/app/src/main/res/values/credentials.xml
+/app/src/main/res/values/strings.xml
