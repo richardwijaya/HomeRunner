@@ -49,7 +49,7 @@ class Texture {
     /**
      * Add File Instantiation
      */
-    Bitmap textureBitmap = BitmapFactory.decodeFile(new File(context.getCacheDir(),"whole_streetview.png").getAbsolutePath());
+    Bitmap textureBitmap = BitmapFactory.decodeFile(new File(context.getCacheDir(),texturePath).getAbsolutePath());
 
     GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, textureBitmap, 0);
     textureBitmap.recycle();

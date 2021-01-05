@@ -108,7 +108,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   protected int objectModelViewProjectionParam;
 
   protected TexturedMesh room;
-  protected Texture roomTex;
+  protected ArrayList<Texture> roomTex;
 
   private float[] camera;
   private float[] view;
@@ -136,8 +136,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
   private static final int DISTANCE_PER_STEP = 10;
 
-  private ArrayList<JSONObject> arrSteps;
-
   private int distanceElapsed;
   private int curStepIndex;
   private int curStepDistance;
@@ -157,15 +155,15 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
     sensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_FASTEST);
 
-    sVLoader = new StreetViewLoader(this);
-
     distanceElapsed = 0;
     curStepIndex = 0;
     curStepDistance = 0;
 
-    arrSteps = new ArrayList<>();
+    roomTex = new ArrayList<>();
 
-    loadJSONDir();
+//    arrSteps = new ArrayList<>();
+
+//    loadJSONDir();
 
     initializeGvrView();
 
@@ -222,18 +220,8 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
   @Override
   public void onSurfaceChanged(int width, int height) {
-    String filepath = getIntent().getStringExtra("bitmap_texture");
-    try {
-      room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
-      roomTex = new Texture(this, filepath);
-    } catch (IOException e) {
-      Log.e(TAG, "Unable to initialize objects", e);
-    }
-    drawRoom();
     Log.i(TAG, "onSurfaceChanged");
   }
-
-
 
   /**
    * Creates the buffers we use to store information about the 3D world.
@@ -259,13 +247,15 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     Matrix.setIdentityM(modelRoom, 0);
     Matrix.translateM(modelRoom, 0, 0, DEFAULT_FLOOR_HEIGHT, 0);
 
-    String filepath = getIntent().getStringExtra("bitmap_texture");
+    int imgLength = getIntent().getIntExtra("length",0);
 
-    try {
-      room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
-      roomTex = new Texture(this, filepath);
-    } catch (IOException e) {
-      Log.e(TAG, "Unable to initialize objects", e);
+    for(int i = 0; i < imgLength; i++) {
+      try {
+        room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
+        roomTex.add(new Texture(this, "streetview" + i + ".png"));
+      } catch (IOException e) {
+        Log.e(TAG, "Unable to initialize objects", e);
+      }
     }
   }
 
@@ -320,13 +310,31 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   }
 
   @Override
-  public void onFinishFrame(Viewport viewport) {}
+  public void onFinishFrame(Viewport viewport) {
+    File cacheDir = getCacheDir();
+    deleteDir(cacheDir);
+  }
+
+  public static boolean deleteDir(File dir) {
+    if (dir.isDirectory()) {
+      String[] children = dir.list();
+      for (int i=0; i<children.length; i++) {
+        boolean success = deleteDir(new File(dir, children[i]));
+        if (!success) {
+          return false;
+        }
+      }
+    }
+
+    // The directory is now empty so delete it
+    return dir.delete();
+  }
 
   /** Draw the room. */
   public void drawRoom() {
     GLES20.glUseProgram(objectProgram);
     GLES20.glUniformMatrix4fv(objectModelViewProjectionParam, 1, false, modelViewProjection, 0);
-    roomTex.bind();
+    roomTex.get(curStepIndex).bind();
     room.draw();
     Util.checkGlError("drawRoom");
   }
@@ -339,104 +347,20 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     Log.i(TAG, "onCardboardTrigger");
   }
 
-
-  public void loadJSONDir(){
-    File file = new File(getCacheDir(),"dir_route.json");
-
-    String jsonTemp = "";
-
-    JSONObject jsonDir;
-
-    try {
-      BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-
-      String curLine = bufferedReader.readLine();
-
-      while (curLine != null){
-        jsonTemp += curLine;
-        curLine = bufferedReader.readLine();
-      }
-
-      jsonDir = new JSONObject(jsonTemp);
-
-      JSONArray jsonArrRoute = jsonDir.getJSONArray("routes");
-
-      for(int i = 0; i < jsonArrRoute.length(); i++){
-        JSONObject jsonRoute = jsonArrRoute.getJSONObject(i);
-
-        JSONArray jsonArrLegs = jsonRoute.getJSONArray("legs");
-
-        for(int j = 0; j < jsonArrLegs.length(); j++){
-          JSONObject jsonLegs = jsonArrLegs.getJSONObject(j);
-
-          JSONArray jsonArrSteps = jsonLegs.getJSONArray("steps");
-
-          for(int k = 0; k < jsonArrSteps.length(); k++){
-            arrSteps.add(jsonArrSteps.getJSONObject(k));
-          }
-        }
-      }
-      curStepDistance = getDistanceValue();
-    }catch (Exception ex){
-
-    }
-  }
-
-  public int getDistanceValue() throws JSONException {
-      return arrSteps.get(curStepIndex).getJSONObject("distance").getInt("value");
-  }
+//  public int getDistanceValue() throws JSONException {
+//      return arrSteps.get(curStepIndex).getJSONObject("distance").getInt("value");
+//  }
 
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     Log.i("Sensor", "Step Detector");
 
-    if(sensorEvent.sensor == this.stepDetector){
-      if(curStepIndex < arrSteps.size()){
-        distanceElapsed += DISTANCE_PER_STEP;
-
-        if(distanceElapsed % 50 == 0) {
-
-          sVLoader = new StreetViewLoader(this);
-
-          int heading = 0;
-
-          int svUrlLength = 4;
-
-          String[] urlArr = new String[svUrlLength];
-
-          String svTempURL;
-
-          double lat = 0, lng = 0;
-
-          try {
-            lat = arrSteps.get(curStepIndex).getJSONObject("end_location").getDouble("lat");
-
-            lng = arrSteps.get(curStepIndex).getJSONObject("end_location").getDouble("lng");
-
-          } catch (Exception ex){
-
-          }
-
-          svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + lat + ","+ lng  + "&key=" + getString(R.string.key)
-                  + "&heading=";
-
-          for (int j = 0; j < svUrlLength; j++) {
-            urlArr[j] = svTempURL + heading;
-            heading += 90;
-          }
-
-          sVLoader.execute(urlArr);
-
-          curStepIndex++;
-
-        } else if(distanceElapsed >= curStepDistance){
-          curStepIndex++;
-        }
+    if(sensorEvent.sensor == this.stepDetector) {
+      distanceElapsed += DISTANCE_PER_STEP;
+      Log.i("distanceElapsed",""+ distanceElapsed);
+      if(distanceElapsed % 50 == 0) {
+        curStepIndex++;
       }
-
-      Log.i("Distance Elapsed",distanceElapsed+"");
-      Log.i("Current Step Distance", curStepDistance+"");
-
     }
   }
 

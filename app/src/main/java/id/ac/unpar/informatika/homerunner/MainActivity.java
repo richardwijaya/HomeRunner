@@ -26,10 +26,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         startButton = (Button) findViewById(R.id.startBtn);
-
         originET = (EditText) findViewById(R.id.originET);
         destET = (EditText) findViewById(R.id.destET);
-
         oriTV = (TextView) findViewById(R.id.originTV);
         destTV = (TextView) findViewById(R.id.destTV);
 
@@ -38,22 +36,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
         startButton.setText("Start Running");
-
         startButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         if(view.getId() == startButton.getId()){
-            Intent intent = new Intent(this, HelloVrActivity.class);
-
-            intent.putExtra("destination", destET.getText().toString());
-
-            sVLoader = new StreetViewLoader(intent, this);
 
             DirectionsLoader dirLoader = new DirectionsLoader(this);
-
-            String[] urlArr = generateStreetViewURL(4);
 
             String dirURL = "https://maps.googleapis.com/maps/api/directions/json?" +
                     "mode=walking&origin=" + originET.getText().toString() + "&destination=" +
@@ -62,24 +52,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d("doInBackground", dirURL);
 
             dirLoader.execute(dirURL);
-
-            sVLoader.execute(urlArr);
         }
     }
 
-    protected String[] generateStreetViewURL(int svUrlLength){
-        int heading = 0;
 
-        String[] urlArr = new String[svUrlLength];
-
-        String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+ originET.getText().toString() +"&key="+ getString(R.string.key)
-                + "&heading=";
-
-        for(int i = 0 ; i < svUrlLength ; i++){
-            urlArr[i] = svTempURL + heading;
-            heading += 90;
-        }
-
-        return urlArr;
-    }
 }

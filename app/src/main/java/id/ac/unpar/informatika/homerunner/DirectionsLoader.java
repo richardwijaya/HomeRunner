@@ -1,25 +1,26 @@
 package id.ac.unpar.informatika.homerunner;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class DirectionsLoader extends AsyncTask<String,Void,Void> {
 
-    protected MainActivity mainActivity;
-    protected String filePath, jsonText;
+    protected String jsonText;
+    protected Activity activity;
 
-    public DirectionsLoader(MainActivity mainActivity){
-        this.mainActivity = mainActivity;
-        filePath = "dir_route.json";
+    public DirectionsLoader(Activity activity){
+        this.activity = activity;
         jsonText = "";
     }
 
@@ -27,9 +28,7 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
     protected Void doInBackground(String... strings) {
         try {
             URL url = new URL(strings[0]);
-
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
             conn.connect();
             InputStream inputStream = conn.getInputStream();
 
@@ -46,33 +45,24 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
 
             conn.disconnect();
 
-
-        } catch (Exception ex) {
-
-        }
+        } catch (Exception ex) {}
 
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        try {
-            File file = new File(mainActivity.getCacheDir(), filePath);
-            if(file.exists()){
-                file.delete();
-                file = new File(mainActivity.getCacheDir(), filePath);
-                file.createNewFile();
-            }
-            FileOutputStream fOS = new FileOutputStream(file);
+        DirectionsExtractor dirExtractor = new DirectionsExtractor(jsonText);
+        Log.d("JSONText",jsonText);
 
-            FileWriter fileWriter = new FileWriter(file, false);
-            fileWriter.write(jsonText);
-            fileWriter.close();
+        dirExtractor.extractJSONDir();
 
-            fOS.flush();
-            fOS.close();
-        }catch(Exception e){
-            Log.e("Create File", "Failed");
-        }
+        Intent intent = new Intent(activity, HelloVrActivity.class);
+
+        Log.d("Steps from Extractor", dirExtractor.arrSteps.get(0).toString());
+
+        StreetViewLoader streetViewLoader = new StreetViewLoader(activity, intent, dirExtractor.arrSteps);
+
+        streetViewLoader.execute();
     }
 }

@@ -25,7 +25,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher_hello_vr_round"
+        android:icon="@drawable/homerunner_icon_2"
         android:label="HelloVrActivity"
         android:supportsRtl="true"
         android:theme="@style/VrActivityTheme">
