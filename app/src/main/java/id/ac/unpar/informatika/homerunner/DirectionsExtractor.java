@@ -56,7 +56,6 @@ public class DirectionsExtractor {
                     }
                 }
             }
-//            curStepDistance = getDistanceValue();
         }catch (Exception ex){
 
         }

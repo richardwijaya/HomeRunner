@@ -17,3 +17,6 @@ local.properties
 
 #Credentials
 /app/src/main/res/values/strings.xml
+
+#all apk
+.apk

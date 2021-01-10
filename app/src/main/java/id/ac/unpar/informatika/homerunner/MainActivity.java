@@ -34,7 +34,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         oriTV.setText("Origin");
         destTV.setText("Destination");
 
-
         startButton.setText("Start Running");
         startButton.setOnClickListener(this);
     }
@@ -50,6 +49,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     destET.getText().toString() + "&key="+ getString(R.string.key);
 
             Log.d("doInBackground", dirURL);
+
+            originET.setText("");
+            destET.setText("");
 
             dirLoader.execute(dirURL);
         }

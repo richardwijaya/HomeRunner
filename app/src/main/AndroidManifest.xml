@@ -39,7 +39,7 @@
         </activity>
 
         <activity
-            android:name="id.ac.unpar.informatika.homerunner.HelloVrActivity"
+            android:name="id.ac.unpar.informatika.homerunner.VrActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|uiMode|navigation|density"
             android:enableVrMode="@string/gvr_vr_mode_component"
             android:label="@string/app_name"

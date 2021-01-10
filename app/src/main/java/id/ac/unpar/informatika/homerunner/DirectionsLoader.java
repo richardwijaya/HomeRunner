@@ -57,7 +57,7 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
 
         dirExtractor.extractJSONDir();
 
-        Intent intent = new Intent(activity, HelloVrActivity.class);
+        Intent intent = new Intent(activity, VrActivity.class);
 
         Log.d("Steps from Extractor", dirExtractor.arrSteps.get(0).toString());
 

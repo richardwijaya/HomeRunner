@@ -36,13 +36,7 @@ import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -57,7 +51,7 @@ import javax.microedition.khronos.egl.EGLConfig;
  * Daydream mode, the user can use the controller to position the cursor, and use the controller
  * buttons to invoke the trigger action.
  */
-public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
+public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
   private static final String TAG = "HelloVrActivity";
 
   private static final float Z_NEAR = 0.01f;
@@ -110,6 +104,8 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   protected TexturedMesh room;
   protected ArrayList<Texture> roomTex;
 
+  protected Texture finishedTexture;
+
   private float[] camera;
   private float[] view;
   private float[] headView;
@@ -128,11 +124,6 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
   private SensorManager sensorManager;
   private Sensor stepDetector;
-
-
-  private StreetViewLoader sVLoader;
-
-  private Bitmap sVBitmap;
 
   private static final int DISTANCE_PER_STEP = 10;
 
@@ -179,7 +170,7 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   }
 
   public void initializeGvrView() {
-    setContentView(R.layout.common_ui);
+    setContentView(R.layout.activity_vr);
 
     GvrView gvrView = findViewById(R.id.gvr_view);
     gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
@@ -249,10 +240,16 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
 
     int imgLength = getIntent().getIntExtra("length",0);
 
+    try {
+      finishedTexture = new Texture(this, "finish_image.png", false);
+    } catch (IOException e){
+
+    }
+
     for(int i = 0; i < imgLength; i++) {
       try {
         room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
-        roomTex.add(new Texture(this, "streetview" + i + ".png"));
+        roomTex.add(new Texture(this, "streetview" + i + ".png", true));
       } catch (IOException e) {
         Log.e(TAG, "Unable to initialize objects", e);
       }
@@ -318,15 +315,13 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   public static boolean deleteDir(File dir) {
     if (dir.isDirectory()) {
       String[] children = dir.list();
-      for (int i=0; i<children.length; i++) {
+      for (int i = 0; i < children.length; i++) {
         boolean success = deleteDir(new File(dir, children[i]));
         if (!success) {
           return false;
         }
       }
     }
-
-    // The directory is now empty so delete it
     return dir.delete();
   }
 
@@ -334,7 +329,10 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
   public void drawRoom() {
     GLES20.glUseProgram(objectProgram);
     GLES20.glUniformMatrix4fv(objectModelViewProjectionParam, 1, false, modelViewProjection, 0);
-    roomTex.get(curStepIndex).bind();
+    if (curStepIndex >= roomTex.size())
+      finishedTexture.bind();
+    else
+      roomTex.get(curStepIndex).bind();
     room.draw();
     Util.checkGlError("drawRoom");
   }
@@ -358,9 +356,9 @@ public class   HelloVrActivity extends GvrActivity implements GvrView.StereoRend
     if(sensorEvent.sensor == this.stepDetector) {
       distanceElapsed += DISTANCE_PER_STEP;
       Log.i("distanceElapsed",""+ distanceElapsed);
-      if(distanceElapsed % 50 == 0) {
+      if(distanceElapsed % 50 == 0)
         curStepIndex++;
-      }
+
     }
   }
 

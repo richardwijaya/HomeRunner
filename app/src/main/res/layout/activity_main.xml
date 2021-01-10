@@ -4,13 +4,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/background"
+    android:gravity="center_vertical"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Home Runner"
+        android:gravity="center"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:id="@+id/titleTV"
+        android:textColor="@color/dark_blue"
+        />
 
     <TextView
         android:id="@+id/originTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textSize="30dp"
+        android:textColor="@color/blue_green"
+        />
 
     <EditText
         android:layout_width="match_parent"
@@ -21,7 +38,10 @@
         android:id="@+id/destTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textSize="30dp"
+        android:textColor="@color/blue_green"
+        />
 
     <EditText
         android:layout_width="match_parent"
@@ -31,7 +51,10 @@
 
     <Button
         android:id="@+id/startBtn"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Button"
+        android:layout_gravity="center"
+        android:textSize="30dp"
+        />
 </LinearLayout>

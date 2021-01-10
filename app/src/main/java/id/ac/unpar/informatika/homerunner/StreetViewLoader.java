@@ -38,48 +38,13 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... aVoid) {
         for(int i = 0; i < arrSteps.size(); i++){
             int length = 4;
-            Bitmap[] bitmaps = new Bitmap[length];
-            String[] urls = generateStreetViewURL(length);
 
-            for (int j = 0; j < length; j++) {
-                try {
-                    URL url = new URL(urls[j]);
+            boolean isEnd = (i == arrSteps.size() - 1 ? true : false);
 
-                    InputStream input = url.openStream();
+            createStreetViewImage(generateStreetViewURL(length, true));
 
-                    bitmaps[j] = BitmapFactory.decodeStream(input);
-                } catch (Exception ex) {
-
-                }
-            }
-//            Log.d("doInBackground", Arrays.toString(bitmaps));
-            int width = bitmaps[0].getWidth();
-            int height = bitmaps[0].getHeight();
-
-            width *= bitmaps.length;
-
-            Bitmap allBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(allBitmap);
-            int left = 0;
-            for (int j = 0; j < bitmaps.length; j++) {
-                left = (j == 0 ? 0 : left + bitmaps[j].getWidth());
-                canvas.drawBitmap(bitmaps[j], left, 0, null);
-            }
-            streetViewBitmap = allBitmap;
-
-            try {
-                File file = new File(activity.getCacheDir(), generateFilePath());
-                if (file.exists()) {
-                    file.delete();
-                    file = new File(activity.getCacheDir(), generateFilePath());
-                }
-//                Log.d("File Created", "Okay");
-                FileOutputStream fOS = new FileOutputStream(file);
-                streetViewBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
-                fOS.flush();
-                fOS.close();
-            } catch (Exception e) {
-//                Log.e("Create File", "Failed");
+            if(isEnd) {
+                createStreetViewImage(generateStreetViewURL(length,false));
             }
             publishProgress();
         }
@@ -92,23 +57,22 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
         imgCount++;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onPostExecute(Void aVoid) {
-        ((MainActivity) activity).originET.setText("");
-        ((MainActivity) activity).destET.setText("");
         intent.putExtra("length", imgCount);
 
-        activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
+        activity.startActivity(intent);
     }
 
-    protected String[] generateStreetViewURL(int svUrlLength){
+    protected String[] generateStreetViewURL(int svUrlLength, boolean isStart){
         int heading = 0;
 
         String[] urlArr = new String[svUrlLength];
 
+        String location = (isStart ? getLocation("start_location") : getLocation("end_location"));
+
         String svTempURL = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location="+
-                getLocation("start_location") +"&key="+ activity.getString(R.string.key) + "&heading=";
+                location +"&key="+ activity.getString(R.string.key) + "&heading=";
 
         for(int i = 0 ; i < svUrlLength ; i++){
             urlArr[i] = svTempURL + heading;
@@ -133,8 +97,44 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
             endLoc = arrSteps.get(imgCount).getJSONObject(startOrEndKey).getDouble("lng");
         } catch (Exception ex){  Log.e("Get Location", "Failed"); }
 
-        Log.d("Coordinate", startLoc + "," + endLoc);
         return startLoc + "," + endLoc;
+    }
+
+    public void createStreetViewImage(String[] urls){
+        Bitmap[] bitmaps = new Bitmap[urls.length];
+        for (int j = 0; j < urls.length; j++) {
+            try {
+                URL url = new URL(urls[j]);
+                InputStream input = url.openStream();
+                bitmaps[j] = BitmapFactory.decodeStream(input);
+            } catch (Exception ex) {}
+        }
+
+        int width = bitmaps[0].getWidth();
+        int height = bitmaps[0].getHeight();
+
+        width *= bitmaps.length;
+
+        Bitmap allBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(allBitmap);
+        int left = 0;
+        for (int j = 0; j < bitmaps.length; j++) {
+            left = (j == 0 ? 0 : left + bitmaps[j].getWidth());
+            canvas.drawBitmap(bitmaps[j], left, 0, null);
+        }
+        streetViewBitmap = allBitmap;
+
+        try {
+            File file = new File(activity.getCacheDir(), generateFilePath());
+            if (file.exists()) {
+                file.delete();
+                file = new File(activity.getCacheDir(), generateFilePath());
+            }
+            FileOutputStream fOS = new FileOutputStream(file);
+            streetViewBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOS);
+            fOS.flush();
+            fOS.close();
+        } catch (Exception e) {}
     }
 
 }
