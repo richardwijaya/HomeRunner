@@ -63,8 +63,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
 
   private static final float DEFAULT_FLOOR_HEIGHT = -1.6f;
 
-  private static final float ANGLE_LIMIT = 0.2f;
-
   // The maximum yaw and pitch of the target object, in degrees. After hiding the target, its
   // yaw will be within [-MAX_YAW, MAX_YAW] and pitch will be within [-MAX_PITCH, MAX_PITCH].
 //  private static final float MAX_YAW = 100.0f;
@@ -101,11 +99,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   protected int objectUvParam;
   protected int objectModelViewProjectionParam;
 
-  protected TexturedMesh room;
-  protected ArrayList<Texture> roomTex;
-
-  protected Texture finishedTexture;
-
   private float[] camera;
   private float[] view;
   private float[] headView;
@@ -114,10 +107,14 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
 
   private float[] modelRoom;
 
-  private float[] tempPosition;
   private float[] headRotation;
 
   private Properties gvrProperties;
+
+  protected TexturedMesh room;
+  protected ArrayList<Texture> roomTex;
+  protected Texture finishedTexture;
+
   // This is an opaque wrapper around an internal GVR property. It is set via Properties and
   // should be shutdown via a {@link Value#close()} call when no longer needed.
   private final Value floorHeight = new Value();
@@ -125,11 +122,12 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   private SensorManager sensorManager;
   private Sensor stepDetector;
 
-  private static final int DISTANCE_PER_STEP = 10;
+  private static final int DISTANCE_PER_STEP = 100;
 
   private int distanceElapsed;
   private int curStepIndex;
   private int curStepDistance;
+  private int[] stepsDistance;
 
   /**
    * Sets the view to our GvrView and initializes the transformation matrices we will use
@@ -148,13 +146,12 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
 
     distanceElapsed = 0;
     curStepIndex = 0;
-    curStepDistance = 0;
 
     roomTex = new ArrayList<>();
 
-//    arrSteps = new ArrayList<>();
+    stepsDistance = getIntent().getIntArrayExtra("stepDistances");
 
-//    loadJSONDir();
+    curStepDistance = stepsDistance[curStepIndex];
 
     initializeGvrView();
 
@@ -163,7 +160,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
     modelViewProjection = new float[16];
     modelView = new float[16];
     // Target object first appears directly in front of user.
-    tempPosition = new float[4];
     headRotation = new float[4];
     modelRoom = new float[16];
     headView = new float[16];
@@ -354,17 +350,22 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
     Log.i("Sensor", "Step Detector");
 
     if(sensorEvent.sensor == this.stepDetector) {
-      distanceElapsed += DISTANCE_PER_STEP;
-      Log.i("distanceElapsed",""+ distanceElapsed);
-      if(distanceElapsed % 50 == 0)
-        curStepIndex++;
-
+      Log.d("CurStepIndex", curStepIndex+"");
+      Log.d("StepDistanceLength", ""+stepsDistance.length);
+      if (curStepIndex < stepsDistance.length) {
+        distanceElapsed += DISTANCE_PER_STEP;
+        Log.i("distanceElapsed", "" + distanceElapsed);
+        if (distanceElapsed >= curStepDistance) {
+          curStepIndex++;
+          if(curStepIndex < stepsDistance.length)
+            curStepDistance += stepsDistance[curStepIndex];
+        }
+      }
     }
   }
 
   @Override
-  public void onAccuracyChanged(Sensor sensor, int i) {
-  }
+  public void onAccuracyChanged(Sensor sensor, int i) {}
 }
 
 

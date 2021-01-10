@@ -10,6 +10,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -60,6 +62,15 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         intent.putExtra("length", imgCount);
+
+        int[] stepsDistance = new int[arrSteps.size()];
+        for (int i = 0; i < arrSteps.size(); i++){
+            try{
+                stepsDistance[i] = arrSteps.get(i).getJSONObject("distance").getInt("value");
+            } catch (Exception ex){}
+        }
+
+        intent.putExtra("stepDistances", stepsDistance);
 
         activity.startActivity(intent);
     }
