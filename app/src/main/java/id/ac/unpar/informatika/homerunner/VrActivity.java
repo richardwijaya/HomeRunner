@@ -339,11 +339,11 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     if(sensorEvent.sensor == this.stepDetector) {
-      Log.d("CurStepIndex", curStepIndex+"");
-      Log.d("StepDistanceLength", ""+stepsDistance.length);
+//      Log.d("CurStepIndex", curStepIndex+"");
+//      Log.d("StepDistanceLength", ""+stepsDistance.length);
       if (curStepIndex < stepsDistance.length) {
         distanceElapsed += DISTANCE_PER_STEP;
-        Log.i("distanceElapsed", "" + distanceElapsed);
+//        Log.i("distanceElapsed", "" + distanceElapsed);
         if (distanceElapsed >= curStepDistance) {
           curStepIndex++;
           if(curStepIndex < stepsDistance.length)

@@ -20,14 +20,11 @@ public class DirectionsExtractor {
     }
 
     public void extractJSONDir(){
-
         String jsonTemp = "";
-
         JSONObject jsonDir;
 
         try {
             BufferedReader bufferedReader = new BufferedReader(new StringReader(jsonText));
-
             String curLine = bufferedReader.readLine();
 
             while (curLine != null){

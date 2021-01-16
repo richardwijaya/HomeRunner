@@ -87,7 +87,7 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
 
         for(int i = 0 ; i < svUrlLength ; i++){
             urlArr[i] = svTempURL + heading;
-            Log.d("StreetViewURL", urlArr[i]);
+//            Log.d("StreetViewURL", urlArr[i]);
             heading += 90;
         }
 

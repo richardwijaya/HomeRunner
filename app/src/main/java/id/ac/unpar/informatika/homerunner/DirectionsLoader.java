@@ -53,16 +53,11 @@ public class DirectionsLoader extends AsyncTask<String,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         DirectionsExtractor dirExtractor = new DirectionsExtractor(jsonText);
-        Log.d("JSONText",jsonText);
-
         dirExtractor.extractJSONDir();
 
         Intent intent = new Intent(activity, VrActivity.class);
 
-        Log.d("Steps from Extractor", dirExtractor.arrSteps.get(0).toString());
-
         StreetViewLoader streetViewLoader = new StreetViewLoader(activity, intent, dirExtractor.arrSteps);
-
         streetViewLoader.execute();
     }
 }
