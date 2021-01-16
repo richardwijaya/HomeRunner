@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -41,18 +42,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         if(view.getId() == startButton.getId()){
 
-            DirectionsLoader dirLoader = new DirectionsLoader(this);
+            if (originET.getText().toString().equals("") || destET.getText().toString().equals("")) {
+                Toast.makeText(getBaseContext(),"Origin or Destination Text Box can't be Empty",
+                        Toast.LENGTH_SHORT).show();
+            } else {
 
-            String dirURL = "https://maps.googleapis.com/maps/api/directions/json?" +
-                    "mode=walking&origin=" + originET.getText().toString() + "&destination=" +
-                    destET.getText().toString() + "&key="+ getString(R.string.key);
+                DirectionsLoader dirLoader = new DirectionsLoader(this);
 
-            Log.d("doInBackground", dirURL);
+                String dirURL = "https://maps.googleapis.com/maps/api/directions/json?" +
+                        "mode=walking&origin=" + originET.getText().toString() + "&destination=" +
+                        destET.getText().toString() + "&key=" + getString(R.string.key);
 
-            originET.setText("");
-            destET.setText("");
+                Log.d("doInBackground", dirURL);
 
-            dirLoader.execute(dirURL);
+                originET.setText("");
+                destET.setText("");
+
+                dirLoader.execute(dirURL);
+            }
         }
     }
 
