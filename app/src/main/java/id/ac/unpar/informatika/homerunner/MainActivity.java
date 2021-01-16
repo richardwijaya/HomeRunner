@@ -18,7 +18,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected EditText originET, destET;
     protected TextView oriTV, destTV;
     protected Button startButton;
-    protected StreetViewLoader sVLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

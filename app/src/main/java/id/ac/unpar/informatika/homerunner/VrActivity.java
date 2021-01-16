@@ -169,7 +169,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
     setContentView(R.layout.activity_vr);
 
     GvrView gvrView = findViewById(R.id.gvr_view);
-    gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
 
     gvrView.setRenderer(this);
     gvrView.setTransitionViewEnabled(true);
@@ -305,17 +304,15 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   @Override
   public void onFinishFrame(Viewport viewport) {
     File cacheDir = getCacheDir();
-    deleteDir(cacheDir);
+    emptyDir(cacheDir);
   }
 
-  public static boolean deleteDir(File dir) {
+  public static boolean emptyDir(File dir) {
     if (dir.isDirectory()) {
       String[] children = dir.list();
       for (int i = 0; i < children.length; i++) {
-        boolean success = deleteDir(new File(dir, children[i]));
-        if (!success) {
+        if (!emptyDir(new File(dir, children[i])))
           return false;
-        }
       }
     }
     return dir.delete();
@@ -337,18 +334,10 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
    * Called when the Cardboard trigger is pulled.
    */
   @Override
-  public void onCardboardTrigger() {
-    Log.i(TAG, "onCardboardTrigger");
-  }
-
-//  public int getDistanceValue() throws JSONException {
-//      return arrSteps.get(curStepIndex).getJSONObject("distance").getInt("value");
-//  }
+  public void onCardboardTrigger() {}
 
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
-    Log.i("Sensor", "Step Detector");
-
     if(sensorEvent.sensor == this.stepDetector) {
       Log.d("CurStepIndex", curStepIndex+"");
       Log.d("StepDistanceLength", ""+stepsDistance.length);
