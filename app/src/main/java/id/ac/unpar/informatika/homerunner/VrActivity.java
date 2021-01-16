@@ -346,8 +346,7 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
 //        Log.i("distanceElapsed", "" + distanceElapsed);
         if (distanceElapsed >= curStepDistance) {
           curStepIndex++;
-          if(curStepIndex < stepsDistance.length)
-            curStepDistance += stepsDistance[curStepIndex];
+          curStepDistance += stepsDistance[curStepIndex];
         }
       }
     }
