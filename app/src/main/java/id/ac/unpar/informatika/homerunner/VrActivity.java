@@ -17,7 +17,6 @@
 package id.ac.unpar.informatika.homerunner;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -25,7 +24,6 @@ import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
-import android.util.Log;
 import com.google.vr.ndk.base.Properties;
 import com.google.vr.ndk.base.Properties.PropertyType;
 import com.google.vr.ndk.base.Value;
@@ -52,7 +50,6 @@ import javax.microedition.khronos.egl.EGLConfig;
  * buttons to invoke the trigger action.
  */
 public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, SensorEventListener {
-  private static final String TAG = "HelloVrActivity";
 
   private static final float Z_NEAR = 0.01f;
   private static final float Z_FAR = 10.0f;
@@ -135,8 +132,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
    */
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    Log.i(TAG,"onCreate");
-
     super.onCreate(savedInstanceState);
 
     sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
@@ -200,14 +195,11 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
 
   @Override
   public void onRendererShutdown() {
-    Log.i(TAG, "onRendererShutdown");
     floorHeight.close();
   }
 
   @Override
-  public void onSurfaceChanged(int width, int height) {
-    Log.i(TAG, "onSurfaceChanged");
-  }
+  public void onSurfaceChanged(int width, int height) {}
 
   /**
    * Creates the buffers we use to store information about the 3D world.
@@ -219,7 +211,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
    */
   @Override
   public void onSurfaceCreated(EGLConfig config) {
-    Log.i(TAG, "onSurfaceCreated");
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     objectProgram = Util.compileProgram(OBJECT_VERTEX_SHADER_CODE, OBJECT_FRAGMENT_SHADER_CODE);
@@ -245,9 +236,7 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
       try {
         room = new TexturedMesh(this, "Room.obj", objectPositionParam, objectUvParam);
         roomTex.add(new Texture(this, "streetview" + i + ".png", true));
-      } catch (IOException e) {
-        Log.e(TAG, "Unable to initialize objects", e);
-      }
+      } catch (IOException e) {}
     }
   }
 
@@ -339,11 +328,8 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     if(sensorEvent.sensor == this.stepDetector) {
-//      Log.d("CurStepIndex", curStepIndex+"");
-//      Log.d("StepDistanceLength", ""+stepsDistance.length);
       if (curStepIndex < stepsDistance.length) {
         distanceElapsed += DISTANCE_PER_STEP;
-//        Log.i("distanceElapsed", "" + distanceElapsed);
         if (distanceElapsed >= curStepDistance) {
           curStepIndex++;
           curStepDistance += stepsDistance[curStepIndex];

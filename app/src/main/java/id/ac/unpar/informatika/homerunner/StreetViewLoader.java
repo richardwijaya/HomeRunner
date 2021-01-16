@@ -1,25 +1,17 @@
 package id.ac.unpar.informatika.homerunner;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-
 import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
 
@@ -87,7 +79,6 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
 
         for(int i = 0 ; i < svUrlLength ; i++){
             urlArr[i] = svTempURL + heading;
-//            Log.d("StreetViewURL", urlArr[i]);
             heading += 90;
         }
 
@@ -102,11 +93,9 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
         double startLoc = 0.0;
         double endLoc = 0.0;
         try {
-            Log.d("Steps", arrSteps.get(0).toString());
-
             startLoc = arrSteps.get(imgCount).getJSONObject(startOrEndKey).getDouble("lat");
             endLoc = arrSteps.get(imgCount).getJSONObject(startOrEndKey).getDouble("lng");
-        } catch (Exception ex){  Log.e("Get Location", "Failed"); }
+        } catch (Exception ex){}
 
         return startLoc + "," + endLoc;
     }

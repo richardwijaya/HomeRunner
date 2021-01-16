@@ -1,10 +1,7 @@
 package id.ac.unpar.informatika.homerunner;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -48,7 +45,6 @@ public class DirectionsExtractor {
                     JSONArray jsonArrSteps = jsonLegs.getJSONArray("steps");
 
                     for(int k = 0; k < jsonArrSteps.length(); k++){
-                        Log.d("Steps" , jsonArrSteps.getJSONObject(k).toString());
                         arrSteps.add(jsonArrSteps.getJSONObject(k));
                     }
                 }

@@ -2,17 +2,12 @@ package id.ac.unpar.informatika.homerunner;
 
 
 import android.app.Activity;
-import android.content.Intent;
-//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.Arrays;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -52,8 +47,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 String dirURL = "https://maps.googleapis.com/maps/api/directions/json?" +
                         "mode=walking&origin=" + originET.getText().toString() + "&destination=" +
                         destET.getText().toString() + "&key=" + getString(R.string.key);
-
-                Log.d("doInBackground", dirURL);
 
                 originET.setText("");
                 destET.setText("");
