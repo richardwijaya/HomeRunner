@@ -311,7 +311,7 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   public void drawRoom() {
     GLES20.glUseProgram(objectProgram);
     GLES20.glUniformMatrix4fv(objectModelViewProjectionParam, 1, false, modelViewProjection, 0);
-    if (curStepIndex >= roomTex.size())
+    if (curStepIndex >= roomTex.size() - 1)
       finishedTexture.bind();
     else
       roomTex.get(curStepIndex).bind();
@@ -328,11 +328,12 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
     if(sensorEvent.sensor == this.stepDetector) {
-      if (curStepIndex < stepsDistance.length) {
+      if (curStepIndex <= stepsDistance.length) {
         distanceElapsed += DISTANCE_PER_STEP;
         if (distanceElapsed >= curStepDistance) {
           curStepIndex++;
-          curStepDistance += stepsDistance[curStepIndex];
+          if(curStepIndex < stepsDistance.length-1)
+            curStepDistance += stepsDistance[curStepIndex];
         }
       }
     }
