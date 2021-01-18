@@ -36,11 +36,12 @@ public class StreetViewLoader extends AsyncTask<Void, Void, Void> {
             boolean isEnd = (i == arrSteps.size() - 1 ? true : false);
 
             createStreetViewImage(generateStreetViewURL(length, true));
+            publishProgress();
 
             if(isEnd) {
                 createStreetViewImage(generateStreetViewURL(length,false));
+                publishProgress();
             }
-            publishProgress();
         }
 
         return null;
