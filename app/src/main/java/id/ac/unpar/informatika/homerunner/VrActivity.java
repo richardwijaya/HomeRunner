@@ -24,6 +24,8 @@ import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
+import android.util.Log;
+
 import com.google.vr.ndk.base.Properties;
 import com.google.vr.ndk.base.Properties.PropertyType;
 import com.google.vr.ndk.base.Value;
@@ -158,6 +160,12 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
     headRotation = new float[4];
     modelRoom = new float[16];
     headView = new float[16];
+
+    if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
+      Log.d("Step Detector", "This device has it");
+    } else {
+      Log.d("Step Detector", "This device don't have it");
+    }
   }
 
   public void initializeGvrView() {
@@ -311,7 +319,7 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer, S
   public void drawRoom() {
     GLES20.glUseProgram(objectProgram);
     GLES20.glUniformMatrix4fv(objectModelViewProjectionParam, 1, false, modelViewProjection, 0);
-    if (curStepIndex >= roomTex.size() - 1)
+    if (curStepIndex >= roomTex.size())
       finishedTexture.bind();
     else
       roomTex.get(curStepIndex).bind();
